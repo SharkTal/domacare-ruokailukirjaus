@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruokailukirjaus – prototyyppi</title>
+<style>
+.w{font-family:system-ui,sans-serif;max-width:420px;margin:0 auto;border:1px solid #ccc;border-radius:16px;overflow:hidden;background:#fff;color:#222}
+body{background:#f5f5f5;padding:20px}
+.h{background:#1d6b4f;color:#fff;padding:12px 14px}
+.h b{font-size:15px}
+.tabs{display:flex;gap:6px;margin-top:8px}
+.tabs button{flex:1;border:0;border-radius:8px;padding:6px 2px;font-size:12px;background:rgba(255,255,255,.2);color:#fff;cursor:pointer}
+.tabs button.a{background:#fff;color:#1d6b4f;font-weight:600}
+.bar{padding:8px 14px;background:#f3f6f4;font-size:13px}
+.bar .t{display:flex;justify-content:space-between}
+.pb{height:6px;background:#ddd;margin-top:6px;border-radius:3px;overflow:hidden}
+.pb i{display:block;height:100%;background:#1d6b4f;width:0;transition:width .3s}
+.sum{display:flex;gap:6px;padding:8px 14px;font-size:11px;border-bottom:1px solid #eee}
+.sum div{flex:1;border-radius:8px;padding:5px 2px;text-align:center;color:#fff}
+.c0{background:#a05a00}.c1{background:#1d6b4f}.c2{background:#2d6fb3}.c3{background:#8a3b3b}
+.tools{display:flex;gap:6px;padding:8px 14px;border-bottom:1px solid #eee}
+.tools input{flex:1;min-width:0;padding:8px 10px;border:1px solid #bbb;border-radius:8px;font-size:13px}
+.tools select{padding:8px 6px;border:1px solid #bbb;border-radius:8px;font-size:12px;background:#fff}
+.list{max-height:380px;overflow:auto}
+.sec{padding:6px 14px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;display:flex;justify-content:space-between;cursor:pointer}
+.sec.u{background:#fff3e0;color:#a05a00;cursor:default}
+.g1{background:#e6f2ec;color:#1d6b4f}.g2{background:#e5eef8;color:#2d6fb3}.g3{background:#f6e6e6;color:#8a3b3b}
+.r{padding:8px 14px;border-bottom:1px solid #eee}
+.r.flash{background:#e3f4ea}
+.r .n{font-size:13px;font-weight:600;display:flex;justify-content:space-between}
+.r .n small{font-weight:400;color:#888;margin-left:6px}
+.b{display:flex;gap:6px;margin-top:6px}
+.b button{flex:1;padding:8px 2px;font-size:12px;border:1px solid #ccc;background:#fff;color:#333;border-radius:8px;cursor:pointer}
+.b button.s1{background:#1d6b4f;color:#fff;border-color:#1d6b4f}
+.b button.s2{background:#2d6fb3;color:#fff;border-color:#2d6fb3}
+.b button.s3{background:#8a3b3b;color:#fff;border-color:#8a3b3b}
+.d{padding:7px 14px;border-bottom:1px solid #f0f0f0;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.d small{color:#999;margin-left:6px}
+.d .m{font-size:11px;color:#999}
+.x{padding:6px 14px 10px;background:#fafafa;border-bottom:1px solid #eee}
+.x input{width:100%;box-sizing:border-box;margin-top:6px;padding:7px 9px;border:1px solid #bbb;border-radius:8px;font-size:12px}
+.f{padding:10px 14px;border-top:1px solid #ddd}
+.f button{width:100%;padding:11px;border:0;border-radius:10px;background:#1d6b4f;color:#fff;font-weight:600;cursor:pointer}
+.f button:disabled{background:#bbb;cursor:not-allowed}
+.info{font-size:11px;color:#777;padding:6px 14px}
+.empty{padding:10px 14px;font-size:12px;color:#888}
+</style>
+</head>
+<body>
+<div class="w">
+<div class="h"><b>Ruokailukirjaus (prototyyppi — kuvitteellinen data)</b><div class="tabs" id="tabs"></div></div>
+<div class="bar"><div class="t"><span id="cnt"></span><span id="taps"></span></div><div class="pb"><i id="pb"></i></div></div>
+<div class="sum" id="sum"></div>
+<div class="tools">
+<input id="q" placeholder="Hae nimellä tai huoneella" autocomplete="off">
+<select id="sort"><option value="az">A → Ö</option><option value="za">Ö → A</option><option value="room">Huone</option></select>
+</div>
+<div class="list" id="list"></div>
+<div class="info">Kirjaamattomat: yksi napautus. Kirjatut ryhmitellään tilanteen mukaan. Napauta nimeä korjataksesi tai lisätäksesi huomautuksen.</div>
+<div class="f"><button id="ok" disabled></button></div>
+</div>
+<script>
+const raw=[["Aino V.",12],["Eino M.",3],["Helmi J.",18],["Toivo K.",7],["Lempi H.",1],["Väinö S.",15],["Siiri L.",9],["Armas P.",20],["Elsa N.",5],["Onni R.",11],["Aili T.",2],["Kalle O.",14],["Martta E.",8],["Urho A.",17],["Impi B.",4],["Paavo D.",19],["Hilja F.",6],["Veikko G.",13],["Saima I.",10],["Tauno Y.",16]];
+const meals=["Aamupala","Lounas","Päivällinen","Iltapala"];
+const lab={1:"Ruokasali",2:"Huoneessa",3:"Ei osallistunut"};
+let meal=0,taps=0,st={},flash={},note={},tm={},openId=null,fold={1:false,2:false,3:false};
+const q=document.getElementById('q'),sel=document.getElementById('sort');
+const key=i=>meal+'_'+i;
+function cmp(a,b){const m=sel.value;if(m==='room')return raw[a][1]-raw[b][1];const r=raw[a][0].localeCompare(raw[b][0],'fi');return m==='za'?-r:r}
+function now(){const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+function btns(i){const s=st[key(i)]||0;return `<div class="b">`+[1,2,3].map(v=>`<button class="${s==v?'s'+v:''}" data-i="${i}" data-s="${v}">${lab[v]}</button>`).join('')+`</div>`}
+function render(){
+ document.getElementById('tabs').innerHTML=meals.map((m,i)=>`<button class="${i==meal?'a':''}" data-m="${i}">${m}</button>`).join('');
+ const term=q.value.trim().toLowerCase();
+ const f=i=>!term||raw[i][0].toLowerCase().includes(term)||String(raw[i][1])===term;
+ const un=[],g={1:[],2:[],3:[]};
+ raw.forEach((_,i)=>{const s=st[key(i)];if(s&&!flash[key(i)])g[s].push(i);else un.push(i)});
+ const total=raw.length,done=g[1].length+g[2].length+g[3].length;
+ let h=`<div class="sec u"><span>Kirjaamatta</span><span>${un.length}</span></div>`;
+ const uv=un.filter(f).sort(cmp);
+ h+=uv.length?uv.map(i=>`<div class="r${flash[key(i)]?' flash':''}"><div class="n"><div>${raw[i][0]}<small>huone ${raw[i][1]}</small></div></div>${btns(i)}</div>`).join(''):`<div class="empty">${term?'Ei hakutulosta kirjaamattomissa.':'Kaikki kirjattu.'}</div>`;
+ [1,2,3].forEach(s=>{
+  h+=`<div class="sec g${s}" data-fold="${s}"><span>${lab[s]} (${g[s].length})</span><span>${fold[s]?'▸':'▾'}</span></div>`;
+  if(fold[s])return;
+  const v=g[s].filter(f).sort(cmp);
+  if(!v.length){h+=`<div class="empty">${term?'Ei hakutulosta.':'Ei kirjauksia.'}</div>`;return}
+  v.forEach(i=>{
+   const k=key(i);
+   h+=`<div class="d" data-open="${i}"><span>${raw[i][0]}<small>huone ${raw[i][1]}</small></span><span class="m">${note[k]?'✎ ':''}${tm[k]||''}</span></div>`;
+   if(openId===i)h+=`<div class="x">${btns(i)}<input data-note="${i}" value="${(note[k]||'').replace(/"/g,'&quot;')}" placeholder="Huomautus (ruokahalu, nielemisvaikeudet...)"></div>`;
+  });
+ });
+ const act=document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.note;
+ if(act===undefined){const L=document.getElementById('list');const sc=L.scrollTop;L.innerHTML=h;L.scrollTop=sc}
+ document.getElementById('cnt').textContent=un.length?`Vielä ${un.length} kirjaamatta`:'Kaikki kirjattu';
+ document.getElementById('taps').textContent=taps+' napautuksia';
+ document.getElementById('pb').style.width=(done/total*100)+'%';
+ document.getElementById('sum').innerHTML=`<div class="c0">Odottaa ${un.length}</div><div class="c1">Sali ${g[1].length}</div><div class="c2">Huone ${g[2].length}</div><div class="c3">Ei ${g[3].length}</div>`;
+ const ok=document.getElementById('ok');ok.disabled=un.length>0;
+ ok.textContent=un.length?`Tallenna (${un.length} puuttuu)`:'Tallenna 20 asukkaan kirjaukset';
+}
+q.addEventListener('input',render);
+sel.addEventListener('change',render);
+document.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.note!==undefined){note[key(+e.target.dataset.note)]=e.target.value}});
+document.addEventListener('click',e=>{
+ const t=e.target.closest('[data-m],[data-s],[data-fold],[data-open],#ok');
+ if(!t)return;
+ if(t.dataset.m!==undefined){meal=+t.dataset.m;taps=0;openId=null;render()}
+ else if(t.dataset.s){
+  const i=+t.dataset.i,k=key(i),was=st[k];
+  st[k]=+t.dataset.s;tm[k]=now();taps++;
+  if(!was){flash[k]=1;q.value='';render();setTimeout(()=>{delete flash[k];render()},600)}
+  else{render()}
+ }
+ else if(t.dataset.fold){fold[t.dataset.fold]=!fold[t.dataset.fold];render()}
+ else if(t.dataset.open!==undefined){const i=+t.dataset.open;openId=openId===i?null:i;render()}
+ else if(t.id=='ok'&&!t.disabled){alert('Taustalla luodaan 20 itsenäistä kirjausta. Napautuksia: '+taps)}
+});
+render();
+</script>
+</body>
+</html>
