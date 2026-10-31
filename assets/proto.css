@@ -1,0 +1,68 @@
+/* ==========================================================================
+   Prototyyppi-sivu — oma tumma kehys, ei mitään muuta
+   ==========================================================================
+   Tämä tiedosto on tarkoituksella erillään styles.css:stä: prototyyppisivu on
+   oma sivunsa, ja sen tumma tausta on määritelty täällä eikä inline-tyylinä,
+   jotta taustan ja tekstin kontrasti on yhdestä paikasta luettavissa.
+   ========================================================================== */
+
+body {
+  background: var(--pine-900);
+  color: #fff;
+}
+
+.proto-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px clamp(16px, 4vw, 40px);
+  flex-wrap: wrap;
+  background: var(--pine-900);
+}
+
+.proto-top a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #DCEBE3;          /* 10.1:1 on #0E3B31 */
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.proto-top a:hover { color: #fff; }
+
+.proto-top .tagline {
+  font-size: 12px;
+  letter-spacing: .06em;
+  color: #A9DCC1;          /* 7.9:1 on #0E3B31 */
+  font-weight: 600;
+}
+
+.proto-main {
+  padding: 0 clamp(12px, 3vw, 40px) 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.proto-main .app { max-width: 1080px; }
+
+/* Huomiolaatikko on vaalea kortti tummalla sivulla: teksti saa täyden
+   kontrastin eikä kellu pelkän taustan varassa. */
+.proto-note {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--body);      /* 7.3:1 on #FFFFFF */
+}
+
+.proto-note a { color: var(--pine-700); font-weight: 500; }

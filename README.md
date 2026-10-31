@@ -1,72 +1,66 @@
 # Ruokailukirjaus DomaCaressa – kehitysehdotus
 
-Opiskelijaprojekti. Ehdotus ruokailujen kirjaamisen työnkulun kehittämiseksi DomaCaressa (Invian Oy / Visma).
+Opiskelijaprojekti: ehdotus ruokailujen kirjaamisen työnkulun kehittämiseksi
+DomaCaressa. Sisältää klikattavan prototyypin kuvitteellisella datalla.
 
-**Live-sivu:** https://go.tabbit.space/projects/iahHyXWSg9
+## Tiedostot
 
----
+```
+index.html          Ehdotussivu (kaikki osiot + upotettu prototyyppi)
+prototyyppi.html    Prototyyppi omana sivunaan
+assets/styles.css   Tyylit (design tokenit + komponentit)
+assets/proto.css    Prototyyppisivun oma tumma kehys
+assets/app.js       Prototyypin logiikka
+```
 
-## Tausta
-
-Hoivakodissa ruokailut kirjataan neljästi päivässä: aamupala, lounas, päivällinen ja iltapala. Nykyinen työnkulku on asukaskeskeinen: jokainen asukas avataan erikseen, valitaan osallistuminen ja paikka, tallennetaan ja suljetaan. Yli 20 asukkaalla tämä toistuu kaksikymmentä kertaa – vaikka kyse on yhdestä yhteisestä ateriasta.
-
-Kaksi seurausta:
-
-1. **Toistuva syöttö.** Arvio 1–2 minuuttia per asukas, eli 20–40 minuuttia per ateria ja noin 1,5–3 tuntia päivässä.
-2. **Puuttuvat kirjaukset huomataan myöhään.** Kirjaamattomat eivät erotu näkymästä, joten puute havaitaan usein vasta lopuksi – asukas on jo poistunut ruokasalista ja tilanne joudutaan muistelemaan.
-
-## Ehdotus
-
-Tilannekohtainen ("skenaariokeskeinen") näkymä:
-
-- Valitaan ateria → koko asukaslista näkyy kerralla.
-- Yksi napautus per asukas: ruokasali / huoneessa / ei osallistunut.
-- **Ei oletusarvoja** – mikään ei merkitse itseään, jotta kirjaus ei jää huomaamatta tekemättä.
-- Kirjaamattomat pysyvät ylhäällä, kirjatut siirtyvät tilannekohtaisiin ryhmiin (ryhmät ovat laskettavissa ja taitettavissa).
-- Haku nimellä tai huoneella + lajittelu A→Ö / Ö→A / huone. Asukkaat saapuvat eri aikoina, eivät listajärjestyksessä.
-- Asukaskohtainen huomautus (ruokahalu, nielemisvaikeudet) säilyy avattavana.
-- **Taustalla jokainen asukas saa edelleen oman, jäljitettävän kirjauksensa.** Ehdotus muuttaa käyttöliittymän järjestystä, ei tiedon rakennetta.
+Ei riippuvuuksia, ei build-vaihetta. Avaa `index.html` selaimessa tai julkaise
+sellaisenaan.
 
 ## Rakenne
 
-```
-index.html          Artikkeli: nykytila, vaikutus, ehdotus, rajaus
-prototyyppi.html    Klikattava prototyyppi (upotettu iframeen)
-README.md
-```
+1. Hero + tuotekortti (mitä ehdotetaan, yhdellä silmäyksellä)
+2. Mittarit (20+ asukasta, 4 kirjausta / päivä, 1–2 min / asukas, ~2 h / päivä)
+3. Nykytila – neljä vaihetta + sitaatti
+4. Vaikutus – kolme seurausta + turvallisuushuomio
+5. Ehdotus – kuusi muutosta + mikä ei muutu
+6. Vertailu – työnkulku ennen ja jälkeen
+7. Prototyyppi – toimiva näkymä (valitse ateria, merkitse asukkaat)
+8. Rajaus – mitä ehdotus on ja mitä se ei ole
+9. Seuraava askel + yhteystiedot
 
-Molemmat ovat itsenäisiä tiedostoja – ei riippuvuuksia, ei build-vaihetta. Toimii suoraan GitHub Pagesissa.
+## Prototyypin toiminnot
 
-## Käyttö paikallisesti
+- Aterian valinta (aamupala / lounas / päivällinen / iltapala), kirjaukset erillään per ateria
+- Yksi napautus per asukas: Ruokasali / Huoneessa / Ei osallistunut
+- Kirjaamattomat pysyvät ylhäällä, kirjatut siirtyvät omiin ryhmiinsä
+- Haku nimellä tai huoneella, lajittelu A–Ö / Ö–A / huone
+- Kirjatun rivin avaaminen: tilan korjaus ja asukaskohtainen huomautus
+- Sama nappi uudelleen = kirjaus perutaan
+- Tallennus antaa palautteen; mitään ei lähetetä palvelimelle
+
+Kaikki asukastiedot ovat kuvitteellisia. Tila säilyy vain selainistunnon ajan.
+
+## Tekniset huomiot
+
+- Fontti (Schibsted Grotesk, yksi leikkausperhe koko sivulle) ladataan Google
+  Fontsista. Jos sivun pitää toimia ilman verkkoyhteyttä, fontti kannattaa itse
+  isännöidä `assets/fonts/` hakemistoon ja päivittää `@font-face`-säännöt.
+- Saavutettavuus: semanttinen HTML, otsikkohierarkia, `aria-pressed` /
+  `aria-expanded` -tilat, näppäimistökäyttö, `prefers-reduced-motion`.
+  Leipäteksti on vähintään 12 px, toiminnalliset napit 12 px.
+- Responsiivisuus: 1440 → 1100 → 860 → 620 px. Prototyyppi vaihtuu yhdestä
+  palstasta pinotuksi 860 px alapuolella; tallennusnappi jää näkyviin.
+  Vertailun vaiheketju käännetään alle 620 px pystysuuntaiseksi.
+
+## Julkaisu GitHub Pagesilla
 
 ```bash
 git clone https://github.com/SharkTal/domacare-ruokailukirjaus.git
 cd domacare-ruokailukirjaus
-python3 -m http.server 8000
-# avaa http://localhost:8000
+# kopioi tämän hakemiston sisältö juureen (index.html, prototyyppi.html, assets/)
+git add -A && git commit -m "Uusi ulkoasu ja toimiva prototyyppi"
+git push
 ```
 
-## GitHub Pages
-
-1. Settings → Pages
-2. Source: `Deploy from a branch`
-3. Branch: `main`, kansio: `/ (root)`
-4. Sivu julkaistaan osoitteessa `https://sharktal.github.io/domacare-ruokailukirjaus/`
-
-## Rajaus ja vastuuvapaus
-
-- Tämä on **yhden harjoittelijan henkilökohtainen havainto**, ei harjoitteluorganisaation virallinen kanta.
-- **Ei potilastietoja eikä oikeita henkilötietoja.** Kaikki prototyypin nimet ja huoneet ovat kuvitteellisia.
-- Ei väitettä, ettei järjestelmässä olisi jo vastaavaa toimintoa.
-- Ei sitoumusta toteutuksesta tai aikataulusta.
-- Ei sidoksissa Invian Oy:hyn, Vismaan tai harjoitteluorganisaatioon. DomaCare on Invian Oy:n tuotemerkki.
-
-## Aiempi vastaava työ
-
-Ryhmäkirjaus-optimointi (Attendo / Efima Puhekirjaus): https://sharktal.github.io/attendo-caretech-innovation/
-
-Sama periaate, eri datamuoto: ryhmätilanteessa tieto syötetään kerran ja kohdistetaan usealle. Ruokailuissa sisältö vaihtelee asukkaittain, joten ratkaisu on tilannekohtainen näkymä eikä monivalinta.
-
-## Yhteys
-
-Liu Tao Gao · liutao.gao@gmail.com · https://github.com/SharkTal
+Sen jälkeen repositorion Settings → Pages → Branch: `main`, kansio `/ (root)`.
+Sivu julkaistaan osoitteeseen `https://sharktal.github.io/domacare-ruokailukirjaus/`.
